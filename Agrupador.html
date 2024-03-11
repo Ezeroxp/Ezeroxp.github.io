@@ -8,6 +8,7 @@
 <body>
 <input type="file" id="fileInput" accept=".xlsx, .xls">
 <button id="groupButton">Agrupar</button> 
+<button id="restartButton">Reiniciar</button> 
 <div id="output"></div>
 <script>
 document.getElementById('fileInput').addEventListener('change', handleFile);
@@ -19,21 +20,26 @@ document.getElementById('groupButton').addEventListener('click', function() {
         const output = document.getElementById('output');
         for (let i = 0; i < Ngroups; i++){
             let header = document.createElement('h2');
-            header.textContent = 'Grupo ' + (i+1);
+            header.textContent = 'Grupo ' + (i+1) +", " +personGroup[i].length + " Personas";
             let list = createList(personGroup[i]);
 
             const div = document.createElement('div');
+            div.className = "PeopleList"
             div.appendChild(header);
             div.appendChild(list);
             output.appendChild(div);
         }
-    }
-    
-    
-    
+    }   
 });
-var Working = true;
+document.getElementById('restartButton').addEventListener('click', function() {
+    if(!Working){
+        restart();
+    }   
+});
+
+var Working = false;
 var everyone = {};
+var trueEveryone;
 var Ngroups;
 function handleFile(event) {
     const file = event.target.files[0];
@@ -52,7 +58,6 @@ function handleFile(event) {
         for (let j = 0; j < rows.length; j++){
             let row = rows[j];
             if (row.length > 0) {
-                const rowDiv = document.createElement('div');
                 let hobbiesString = row[row.length -1];
                 let hobbies = hobbiesString.split(",");
                 for (let i = 0; i < hobbies.length; i++){
@@ -64,7 +69,8 @@ function handleFile(event) {
                 
             };   
         };
-        
+       Working = true; 
+       trueEveryone = JSON.parse(JSON.stringify(everyone));
     };
     reader.readAsArrayBuffer(file);
 }
@@ -73,37 +79,40 @@ var groups = {};
 var personGroup = {};
 
 function groupPeople(hobbies){
-    Ngroups = Math.floor(Object.keys(hobbies).length / 10)+1;
-    for (let i = 0; i < Ngroups; i++){
-        groups[i] = Array();
-        personGroup[i] = Array();
-    };
-    startGroups(Ngroups);
-    for(key in everyone){
-        let person = everyone[key];
-        let chemistries = []
+    try{
+        Ngroups = Math.floor(Object.keys(hobbies).length / 10)+1;
         for (let i = 0; i < Ngroups; i++){
-            let chem = groupChemistry(groups[i],person);
-            chemistries.push(chem);
-        }
-        let exit = false;
-        while(!exit){
-            let index = chemistries.indexOf(Math.max(...chemistries));
-            if(groups[index].length < 10 ){
-                groups[index].push(person);
-                personGroup[index].push(key);
-                exit = true;
-                
+            groups[i] = Array();
+            personGroup[i] = Array();
+        };
+        startGroups(Ngroups);
+        for(key in everyone){
+            let person = everyone[key];
+            let chemistries = []
+            for (let i = 0; i < Ngroups; i++){
+                let chem = groupChemistry(groups[i],person);
+                chemistries.push(chem);
             }
-            else{
+            let exit = false;
+            while(!exit){
+                let index = chemistries.indexOf(Math.max(...chemistries));
+                if(groups[index].length < 10 ){
+                    groups[index].push(person);
+                    personGroup[index].push(key);
+                    exit = true;
+                    
+                }
+                else{
 
-                chemistries[index] = 0;
+                    chemistries[index] = 0;
 
+                }
             }
-        }
 
+        }
+    } catch(error){
+        alert("Se ha producido un error.\nRecarga la página e intentalo de nuevo");
     }
-    
 };
 
 function startGroups(Ngroups){
@@ -124,7 +133,7 @@ function groupChemistry(group,person){
     
         sum += similar(person,element);
     });
-    sum -= (group.length*0.15)
+    sum += (group.length/10)
     return sum / group.length;
 };
 
@@ -150,6 +159,14 @@ function createList(array) {
     ul.appendChild(li);
   });
   return ul;
+}
+function restart(){
+    let lists = document.getElementsByClassName("PeopleList");
+    for(let i = lists.length-1; i >= 0; i--){
+        lists[i].remove();
+    }
+    everyone = JSON.parse(JSON.stringify(trueEveryone));
+    Working = true;
 }
 </script>
 

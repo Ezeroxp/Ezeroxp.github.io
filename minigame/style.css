@@ -1,0 +1,78 @@
+body{
+    background-image: url(background.png);
+}
+
+  
+#gameDiv {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    float: initial;
+
+}
+
+#leftTab{
+    display: inline-flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 15%;
+    background-image: url(test1.png);
+    
+    border-right: 10px solid black;
+    padding: 10px;
+    flex-direction: column;
+    
+}
+
+#levelList>li{
+    font-weight: bold;
+    text-transform: capitalize;
+    font-size: 20px;
+    padding-bottom: 5px;
+    cursor: default;
+}
+#rightTab{
+    display: inline-flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 15%;
+    background-image: url(test2.png);
+    border-left: 10px solid black;
+    padding: 10px;
+    flex-direction: column;
+}
+
+
+h2{
+    text-align: center;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+li{
+    font-family: sans-serif;
+}
+canvas {
+    border-width: 10px; 
+    border-image: linear-gradient(to top, #5c5c5c, #cacaca) 1;
+    border-style: solid;
+  }
+
+.centerText{
+    text-align: center;
+    padding: 0%;
+}
+p{
+    font-family: sans-serif;
+}
+#title{
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-size: 50px;
+}
+

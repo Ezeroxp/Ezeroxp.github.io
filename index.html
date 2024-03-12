@@ -1,177 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ordenar Por grupos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Resume Website</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<input type="file" id="fileInput" accept=".xlsx, .xls">
-<button id="groupButton">Agrupar</button> 
-<button id="restartButton">Reiniciar</button> 
-<div id="output"></div>
-<script>
-document.getElementById('fileInput').addEventListener('change', handleFile);
-document.getElementById('groupButton').addEventListener('click', function() {
-    if(Working){
-        groupPeople(everyone);
-        Working = false;
-        console.log (personGroup);
-        const output = document.getElementById('output');
-        for (let i = 0; i < Ngroups; i++){
-            let header = document.createElement('h2');
-            header.textContent = 'Grupo ' + (i+1) +", " +personGroup[i].length + " Personas";
-            let list = createList(personGroup[i]);
+    <header>
+        <h1>Xabier Pascal</h1>
+        <nav>
+            <ul>
+                <li><a href="#about">About Me</a></li>
+                <li><a href="#resume">Resume</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
 
-            const div = document.createElement('div');
-            div.className = "PeopleList"
-            div.appendChild(header);
-            div.appendChild(list);
-            output.appendChild(div);
-        }
-    }   
-});
-document.getElementById('restartButton').addEventListener('click', function() {
-    if(!Working){
-        restart();
-    }   
-});
+    <section id="about">
+        <h2>About Me</h2>
+        <p>Hi I' Xabier Pascal a Computer science student passionate about videogames and software.
+             My hobbies also include Martial arts and Anrchery. My purpose in life is to live interesting adventures.</p>
+    </section>
 
-var Working = false;
-var everyone = {};
-var trueEveryone;
-var Ngroups;
-function handleFile(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
+    <section id="resume">
+        <h2>Resume</h2>
+        <ul>
+            <li>Computer Science degree at <a href="https://www.unavarra.es/portada">UPNA</a></li>
+        </ul>
+    </section>
 
-    reader.onload = function(event) {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    <section id="portfolio">
+        <h2>Portfolio</h2>
+        <div class="portfolio-item">
+            <h3>Sokoban Style videogame</h3>
+            <p>to learn about js and javascript I designed a sokoban videogame</p>
+            <a href="./minigame/index.html">Try It here!</a>
+        </div>
+        <div class="portfolio-item">
+            <h3>Grouping App</h3>
+            <p>I was asked to make an app that groups people into groups depending on their hobbies. <br>
+                The app had to run both on a desktop and Mobile enviroment so I programmed it in Javascript, <br>
+                because of that and because it had no dependencies.
+            </p>
+        </div>
+    </section>
 
-        // Display parsed rows
-        
-        output.innerHTML = '';
-        for (let j = 0; j < rows.length; j++){
-            let row = rows[j];
-            if (row.length > 0) {
-                let hobbiesString = row[row.length -1];
-                let hobbies = hobbiesString.split(",");
-                for (let i = 0; i < hobbies.length; i++){
-                    hobbies[i] = hobbies[i].trim();
-                    hobbies[i] = hobbies[i].toUpperCase();
-                }
-                hobbies.sort();
-                everyone[row[1]] = hobbies;
-                
-            };   
-        };
-       Working = true; 
-       trueEveryone = JSON.parse(JSON.stringify(everyone));
-    };
-    reader.readAsArrayBuffer(file);
-}
+    <section id="contact">
+        <h2>Contact Me</h2>
+        <p>Email: xabierpascal@gmail.com</p>
+        <br>
+    </section>
 
-var groups = {};
-var personGroup = {};
-
-function groupPeople(hobbies){
-    try{
-        Ngroups = Math.floor(Object.keys(hobbies).length / 10)+1;
-        for (let i = 0; i < Ngroups; i++){
-            groups[i] = Array();
-            personGroup[i] = Array();
-        };
-        startGroups(Ngroups);
-        for(key in everyone){
-            let person = everyone[key];
-            let chemistries = []
-            for (let i = 0; i < Ngroups; i++){
-                let chem = groupChemistry(groups[i],person);
-                chemistries.push(chem);
-            }
-            let exit = false;
-            while(!exit){
-                let index = chemistries.indexOf(Math.max(...chemistries));
-                if(groups[index].length < 10 ){
-                    groups[index].push(person);
-                    personGroup[index].push(key);
-                    exit = true;
-                    
-                }
-                else{
-
-                    chemistries[index] = 0;
-
-                }
-            }
-
-        }
-    } catch(error){
-        alert("Se ha producido un error.\nRecarga la página e intentalo de nuevo");
-    }
-};
-
-function startGroups(Ngroups){
-    
-    
-    for (let i = 0; i < Ngroups; i++){
-        let keys = Object.keys(everyone);
-        let a = Math.round(Math.random()*keys.length);
-        groups[i].push(everyone[keys[a]]);
-        personGroup[i].push(keys[a])
-        delete everyone[keys[a]];
-    }
-}
-
-function groupChemistry(group,person){
-    let sum = 0;
-    group.forEach(element => {
-    
-        sum += similar(person,element);
-    });
-    sum += (group.length/10)
-    return sum / group.length;
-};
-
-function similar(p1,p2){
-    let equal1 = 0;
-    
-    p1.forEach(element => {
-        equal1 = p2.includes(element) ? equal1 + 1 : equal1;
-    });
-    let equal2 = 0;
-    p2.forEach(element => {
-        equal2 = p1.includes(element) ? equal2 + 1 : equal2;
-    });
-    let sim = (equal1/p1.length + equal2/p2.length)/2
-    return sim;
-}
-
-function createList(array) {
-  const ul = document.createElement('ul');
-  array.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = item;
-    ul.appendChild(li);
-  });
-  return ul;
-}
-function restart(){
-    let lists = document.getElementsByClassName("PeopleList");
-    for(let i = lists.length-1; i >= 0; i--){
-        lists[i].remove();
-    }
-    everyone = JSON.parse(JSON.stringify(trueEveryone));
-    Working = true;
-}
-</script>
-
-<!-- Include the XLSX library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-
+    <footer>
+        <p>&copy; 2024 Xabier Pascal</p>
+    </footer>
 </body>
 </html>
